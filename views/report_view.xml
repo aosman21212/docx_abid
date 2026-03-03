@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inh_act_report_xml_view" model="ir.ui.view">
+        <field name="name">ir.actions.report.extended</field>
+        <field name="model">ir.actions.report</field>
+        <field name="inherit_id" ref="base.act_report_xml_view"/>
+        <field name="arch" type="xml">
+            <field name='report_type' position="before">
+                <field name='report_docx'/>
+            </field>
+            <field name='paperformat_id' position="after">
+                <field name="template_id" invisible="report_docx != True" required="report_docx == True"
+                    domain="['|','|',('mimetype','=','application/vnd.oasis.opendocument.text'),('mimetype','=','application/vnd.openxmlformats-officedocument.wordprocessingml.document'),('mimetype','=','application/msword')]" context="{'form_view_ref': 'base.view_attachment_form'}"/>
+                <field name="output_file" invisible="report_docx != True"/>
+                <field name="merge_pdf" invisible="report_docx != True or output_file != 'pdf'"/>
+
+                <label for="rotates_page" invisible="report_docx != True or output_file != 'pdf'"/>
+                <div>
+                    <field name="rotates_page" invisible="report_docx != True or output_file != 'pdf'" widget="radio" options="{'horizontal': true}" class="oe_inline"/>
+                    <span><field name="angle_rotate_page" invisible="report_docx != True or output_file != 'pdf'" class="oe_inline"/></span>
+                </div>
+                <field name="merge_template_id" invisible="report_docx != True or output_file != 'pdf'" domain="[('report_type', '=', 'qweb-pdf'),('model','=',model),('report_docx','=',False)]"/>
+            </field>
+            <field name="report_type" position="attributes">
+                <attribute name="invisible">report_docx == True</attribute>
+            </field>
+            <field name="paperformat_id" position="attributes">
+                <attribute name="invisible">report_docx == True or report_type not in ['qweb-pdf']</attribute>
+            </field>
+        </field>
+    </record>
+
+    <record id="bf_act_report_xml_view_tree" model="ir.ui.view">
+        <field name="name">ir.actions.report.docx_abid</field>
+        <field name="model">ir.actions.report</field>
+        <field name="inherit_id" ref="base.act_report_xml_view_tree"/>
+        <field name="arch" type="xml">
+            <field name='report_type' position="before">
+                <field name='report_docx'/>
+            </field>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="act_report_xml_kanban_view">
+        <field name="name">Report BF Kanban</field>
+        <field name="model">ir.actions.report</field>
+        <field name="arch" type="xml">
+            <kanban class="o_bf_theme_kanban" string="Reports BF">
+                <field name="name"/>
+                <field name="binding_model_id"/>
+                <field name="report_type"/>
+                <field name="model"/>
+                <field name="display_name"/>
+                <field name="url_theme_screenshot"/>
+                <templates>
+                    <div t-name="kanban-box" class="o_theme_preview mb16 oe_kanban_global_click">
+
+                        <div class="o_theme_preview_top bg-white mb4 border">
+                            <i t-attf-class="text-center bg-white text-success img-circle fa fa-check-circle {{ 'd-none' if not binding_model_id else '' }}" title="Active"/>
+                            <t t-if="record.url_theme_screenshot.value">
+                                <div class="bg-gray-ligher o_theme_cover" t-attf-style="background-image: url(#{record.url_theme_screenshot.value});"/>
+                            </t>
+                            <t t-if="!record.url_theme_screenshot.value">
+                                <div class="bg-gray-ligher o_theme_cover" t-attf-style="background-image: url(#{'docx_abid/static/src/img/not_screenshot.png'});"/>
+                            </t>
+                            <div class="o_button_area">
+                                <button name="create_action" type="object" t-attf-class="btn btn-primary {{ 'd-none' if binding_model_id else '' }}">Use this theme</button>
+                                <button name="unlink_action" type="object" t-attf-class="btn btn-primary {{ 'd-none' if not binding_model_id else '' }}">Not use this theme</button>
+                            </div>
+                        </div>
+                        <div class="o_theme_preview_bottom clearfix">
+                            <h5 t-if="record.display_name.value" class="text-uppercase float-start">
+                                <b><t t-esc="record.display_name.value"/></b>
+                            </h5>
+                        </div>
+                    </div>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="bf_reports_action" model="ir.actions.act_window">
+        <field name="name">DOCX Report</field>
+        <field name="res_model">ir.actions.report</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('report_docx', '=', True)]</field>
+        <field name="context">{'default_report_docx': True}</field>
+        <field name="search_view_id" ref="base.act_report_xml_search_view"/>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="act_kanban_bf_reports_action">
+        <field eval="99" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="act_window_id" ref="bf_reports_action"/>
+        <field name="view_id" ref="act_report_xml_kanban_view"/>
+    </record>
+    <record model="ir.actions.act_window.view" id="act_tree_bf_reports_action">
+        <field name="sequence" eval="100"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="base.act_report_xml_view_tree"/>
+        <field name="act_window_id" ref="bf_reports_action"/>
+    </record>
+    <record model="ir.actions.act_window.view" id="act_form_bf_reports_action">
+        <field name="sequence" eval="101"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="base.act_report_xml_view"/>
+        <field name="act_window_id" ref="bf_reports_action"/>
+    </record>
+    
+
+    <menuitem
+            id="reports_menuitem_bf"
+            name="DOCX Report"
+            parent="base.reporting_menuitem"
+            action="bf_reports_action"
+            sequence="10"
+            groups="base.group_no_one"
+            />
+</odoo>
