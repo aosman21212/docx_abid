@@ -23,8 +23,6 @@
         'views/report_view.xml'
     ],
 
-    'price': 55.00,
-    'currency': 'EUR',
     'images': ['static/description/icon.png', 'static/description/banner.png', 'static/description/logo.png'],
     'auto_install': False,
     'assets': {
