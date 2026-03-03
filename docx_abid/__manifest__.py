@@ -7,7 +7,7 @@
     'category': 'All',
     'version': '19.0.1.0.0',
     "license": "OPL-1",
-    'author': 'Abdulkaraim Osman',
+    'author': 'LeapAI',
     'depends': [
         'base', 'web'
     ],
