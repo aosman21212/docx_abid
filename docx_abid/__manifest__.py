@@ -5,7 +5,7 @@
     'description': 'Design reports using Microsoft Word. Export Odoo data to DOCX and PDF.',
     'summary': 'Export Odoo data to Microsoft Office — DOCX & PDF reports',
     'category': 'All',
-    'version': '19.0.1.0.0',
+    'version': '17.0.1.0.0',
     "license": "OPL-1",
     'author': 'Abdulkaraim Osman',
     'depends': [

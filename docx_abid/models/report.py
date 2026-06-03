@@ -435,8 +435,8 @@ class IrActionsReport(models.Model):
 
         def postprocess_report(report, record, buffer):
             if report.attachment:
-                # Odoo 19 may use _retrieve_attachment; support both names
-                get_attachment = getattr(report, 'retrieve_attachment', None) or getattr(report, '_retrieve_attachment', None)
+                # Odoo 17 uses _retrieve_attachment; keep fallback for other versions
+                get_attachment = getattr(report, '_retrieve_attachment', None) or getattr(report, 'retrieve_attachment', None)
                 attachment_id = get_attachment(record) if get_attachment else None
                 if not attachment_id:
                     report._postprocess_pdf_report(record, buffer)
